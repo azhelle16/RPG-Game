@@ -26,7 +26,8 @@ var bp = {
 	"tiana" : {"hp":0,"attack":0,"cAttack":0,"main":false,"enemy":false},
 	player1 : "",
 	player2 : "",
-	p1Attack : 1
+	p1Attack : 1,
+	disabled : 0
 }
 
 $(document).ready(function() {
@@ -105,8 +106,8 @@ function generateHPValues() {
  #  AUTHOR        : Maricel Louise Sumulong
  #  DATE          : January 15, 2019 PST
  #  MODIFIED BY   : Maricel Louise Sumulong
- #  REVISION DATE : January 17, 2019 PST
- #  REVISION #    : 3
+ #  REVISION DATE : January 20, 2019 PST
+ #  REVISION #    : 4
  #  DESCRIPTION   : initializes button functionalities
  #  PARAMETERS    : none
  #
@@ -133,6 +134,7 @@ function initializeButtons() {
 				bp.player2 = pr;
 				bp[pr]["enemy"] = true;
 				$("#p2HP").empty().append("Current HP: "+bp[bp.player2]["hp"])
+				bp.disabled += 1
 			  }
 			$(this).parent().css("opacity","0").attr("disabled",true)
 		}
@@ -162,17 +164,39 @@ function initializeButtons() {
 		$("#p2HP").empty().append("Current HP: "+bp[bp.player2]["hp"])
 		bp.p1Attack += 1
 
-		//CHECK IF EITHER PLAYER1 OR PLAYER2 REACHES 0 or LOWER THAN 0
-		if (bp[bp.player1]["hp"] <= 0) {
+		if (bp[bp.player1]["hp"] <= 0 && bp[bp.player2]["hp"] > 0) {
 			$("#p1Status").empty().append("You got defeated by "+ucwords(bp.player2))
 			$("#player1, #p1HP").empty();
 			$("#attackButton").addClass("dispHide");
 			$("#restartButton").removeClass("dispHide");
-		} else if (bp[bp.player2]["hp"] <= 0) {
-			$("#p1Status").empty().append("You defeated "+ucwords(bp.player2))
+		} else if (bp[bp.player2]["hp"] <= 0  && bp[bp.player1]["hp"] > 0) {
+			//CHECK IF THERE IS ENOUGH PLAYERS LEFT
+			if (bp.disabled == $("#prImg img").length - 1) {
+				$("#p1Status").empty().append("Congratulations! You defeated all the princesses!")
+				$("#attackButton").addClass("dispHide");
+				$("#restartButton").removeClass("dispHide");
+			} else {
+				$("#p1Status").empty().append("You defeated "+ucwords(bp.player2))
+			  }						
 			$("#player2, #p2Status, #p2HP").empty();
 			bp.player2 = ""
-		  }
+		  } else if (bp[bp.player2]["hp"] <= 0  && bp[bp.player1]["hp"] <= 0) {
+		  		if (bp[bp.player1]["hp"] > bp[bp.player2]["hp"]) {
+		  			if (bp.disabled == $("#prImg img").length - 1) {
+						$("#p1Status").empty().append("Congratulations! You defeated all the princesses!")
+					} else {
+		  				$("#p1Status").empty().append("You don't have enough HP to continue with the battle.")
+		  			  }	
+		  			$("#player2, #p2HP, #p2Status").empty();
+					$("#attackButton").addClass("dispHide");
+					$("#restartButton").removeClass("dispHide");
+				} else {
+					$("#p1Status").empty().append("You got defeated by "+ucwords(bp.player2))
+					$("#player1, #p1HP").empty();
+					$("#attackButton").addClass("dispHide");
+					$("#restartButton").removeClass("dispHide");
+				  }
+		    }
 
 	})
 
@@ -308,9 +332,9 @@ function ucwords (str) {
  #  FUNCTION NAME : restartGame
  #  AUTHOR        : Maricel Louise Sumulong
  #  DATE          : January 17, 2019 PST
- #  MODIFIED BY   : 
- #  REVISION DATE : 
- #  REVISION #    : 
+ #  MODIFIED BY   : Maricel Louise Sumulong
+ #  REVISION DATE : January 20, 2019 PST
+ #  REVISION #    : 1
  #  DESCRIPTION   : restarts the whole game
  #  PARAMETERS    : none
  #
@@ -331,7 +355,8 @@ function restartGame() {
 		"tiana" : {"hp":0,"attack":0,"cAttack":0,"main":false,"enemy":false},
 		player1 : "",
 		player2 : "",
-		p1Attack : 1
+		p1Attack : 1,
+		disabled : 0
 	}
 
 	$("#player1, #player2, #p1Status, #p2Status, #p1HP, #p2HP").empty();
